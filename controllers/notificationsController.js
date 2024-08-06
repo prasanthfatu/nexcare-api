@@ -11,6 +11,24 @@ const getAllNotifications = async(req, res) => {
     res.json(notifications)
 }
 
+const getNotification = async(req, res) => {
+    const {notId} = req.params
+
+    if(!notId) {
+        return res.status(400).json({message: 'Notification ID is required.'})
+    }
+    
+    // Check if the notification exists
+    const notification = await Notification.findById(notId)
+
+    if(!notification) {
+        res.status(404).json({message: 'Notification Not Found'})
+    }
+
+    res.json(notification)
+
+}
+
 const updateNotification = async (req, res) => {
 
     try {
@@ -65,5 +83,6 @@ const deleteNotification = async(req, res) => {
 module.exports = {
     getAllNotifications,
     updateNotification,
-    deleteNotification
+    deleteNotification,
+    getNotification
 }
