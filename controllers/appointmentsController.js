@@ -144,6 +144,13 @@ const deleteAppointment = async(req, res) => {
         return res.status(400).json({message: `Appointment not found`})
     }
 
+    //delete notification is exists in database
+    const notificationDel = await Notification.find({appointmentId: appointment._id}).exec()
+    if(notificationDel){
+        for(const notification of notificationDel){
+        const delNotify = await notification.deleteOne()
+        }
+    }
     const result = await appointment.deleteOne()
     const reply = `Appointment ${result.patientName} with ${result._id} deleted`
 
