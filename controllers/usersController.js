@@ -85,6 +85,7 @@ const deleteUser = async (req, res) => {
 
     if(appointments.length > 0){
         for(let appointment of appointments){
+            await Notification.deleteOne({appointmentId: appointment._id})
             await Appointment.deleteOne({_id: appointment._id})
         }
     }
