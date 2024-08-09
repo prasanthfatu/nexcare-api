@@ -77,9 +77,7 @@ const deleteUser = async (req, res) => {
     if(!user){
         return res.status(400).json({message: `User not found`})
     }
-
-    console.log(user)
-
+    
     //check appointment if exists
     const appointments = await Appointment.find({patientName: user.username}).lean().exec()
 
