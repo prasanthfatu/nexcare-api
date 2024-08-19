@@ -41,6 +41,12 @@ app.use('/', express.static(path.join(__dirname, '/public')));
 app.use('/img', express.static(path.join(__dirname, 'public/img')));
 app.use('/coverPhoto', express.static(path.join(__dirname, 'public/coverPhoto')));
 
+// Define other routes afterward
+app.get('/img/:folder/:filename', (req, res) => {
+    // This will only be reached if the static file doesn't exist
+    res.send('This is a fallback if the file does not exist.');
+});
+
 // Handle favicon.ico requests with a 204 No Content response
 app.get('/favicon.ico', (req, res) => res.status(204).end());
 
