@@ -39,6 +39,9 @@ app.use(cookieParser());
 //serve static files
 app.use('/', express.static(path.join(__dirname, '/public')));
 
+// Handle favicon.ico requests with a 204 No Content response
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // routes
 app.use('/', require('./routes/root'));
 app.use('/register', require('./routes/register'));
