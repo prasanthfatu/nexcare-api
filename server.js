@@ -37,7 +37,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 //serve static files
-app.use('/', express.static(path.join(__dirname, '/public')));
+//app.use('/', express.static(path.join(__dirname, '/public')));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // routes
 app.use('/', require('./routes/root'));
