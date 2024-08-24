@@ -50,6 +50,9 @@ app.use('/refresh', require('./routes/refresh'));
 app.use('/logout', require('./routes/logout'));
 app.use('/medicaltest', require('./routes/medicaltest'))
 
+//guest
+app.use('/guestauth', require('./routes/guestauth'))
+
 app.use(verifyJWT);
 app.use('/users', require('./routes/api/users'));
 app.use('/tests', require('./routes/api/tests'))
