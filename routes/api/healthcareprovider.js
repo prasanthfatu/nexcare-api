@@ -5,6 +5,6 @@ const verifyRoles = require('../../middleware/verifyRoles')
 const healthcareproviderController = require('../../controllers/healthcareproviderController')
 
 router.route('/')
-    .get(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.HealthcareProvider, ROLES_LIST.User), healthcareproviderController.getHealthcareProvider)
+    .get(verifyRoles(ROLES_LIST.Admin, ROLES_LIST.HealthcareProvider, ROLES_LIST.User, ROLES_LIST.Guest), healthcareproviderController.getHealthcareProvider)
 
 module.exports = router    
