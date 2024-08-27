@@ -3,13 +3,14 @@ const moment = require('moment')
 
 const checkTimeAvailability = async (req, res, next) => {
     const { patientName, test, doctor, date, sTime, eTime } = req.body;
-    const date1 = moment(date).format()
    
     if (!patientName || !test || !doctor || !date || !sTime || !eTime) {
         return res.status(400).json({ message: 'All Fields Are Required' });
     }
-
-    const selectedDate = moment(date).format('YYYY-MM-DD')
+    
+    const indianTime = moment(date).utcOffset("+05:30").format("YYYY-MM-DDTHH:mm:ss.SSS") + 'Z';
+    
+    const selectedDate = moment(indianTime).format('YYYY-MM-DD')
     const currentDate = moment().format('YYYY-MM-DD')
 
     const startDateTimeStr = `${selectedDate}T${sTime}`
@@ -29,7 +30,7 @@ const checkTimeAvailability = async (req, res, next) => {
     }
 
     if (isDateTimeExpired(startDateTime) || isDateTimeExpired(endDateTime)) {
-        return res.status(400).json({ message: 'The given datetime has already expired.' });
+        return res.status(400).json({ message: 'The given time has already expired.' });
     }
 
     if(startDateTime === endDateTime || startDateTime > endDateTime){
