@@ -25,18 +25,18 @@ const checkTimeAvailability = async (req, res, next) => {
     if (selectedDate < currentDate) {
         return res.status(400).json({ message: 'Appointment date has already passed' });
     }
+    
+     if (!moment(sTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]') ||
+        !moment(eTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]')) {
+            return res.status(400).json({ message: 'Please choose a time between 8 AM and 5 PM.' });
+    }
 
     if (isDateTimeExpired(startDateTime) || isDateTimeExpired(endDateTime)) {
         return res.status(400).json({ message: 'The given time has already expired.' });
     }
-
+    
     if(startDateTime === endDateTime || startDateTime > endDateTime){
         return res.status(400).json({ message: 'Enter Valid Time.' });
-    }
-
-    if (!moment(sTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]') ||
-        !moment(eTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]')) {
-            return res.status(400).json({ message: 'Please choose a time between 8 AM and 5 PM.' });
     }
     
     const start = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata');
