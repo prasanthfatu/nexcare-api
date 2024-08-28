@@ -1,27 +1,24 @@
 const Appointment = require('../model/Appointment')
 const moment = require('moment')
+const indianTimeZone = require('moment-timezone')
 
 const checkTimeAvailability = async (req, res, next) => {
     const { patientName, test, doctor, date, sTime, eTime } = req.body;
-   
+        
     if (!patientName || !test || !doctor || !date || !sTime || !eTime) {
         return res.status(400).json({ message: 'All Fields Are Required' });
     }
+
+    const selectedDate = indianTimeZone(date).tz('Asia/Kolkata').format('YYYY-MM-DD')
+    const currentDate = indianTimeZone().tz('Asia/Kolkata').format('YYYY-MM-DD')
+
+    const startDateTime = `${selectedDate}T${sTime}`
     
-    const indianTime = moment(date).utcOffset("+05:30").format("YYYY-MM-DDTHH:mm:ss.SSS") + 'Z';
+    const endDateTime = `${selectedDate}T${eTime}`
+
+    const currentDateTime = indianTimeZone().tz('Asia/Kolkata').format('YYYY-MM-DDTHH:MM')
     
-    const selectedDate = moment(indianTime).format('YYYY-MM-DD')
-    const currentDate = moment().format('YYYY-MM-DD')
-
-    const startDateTimeStr = `${selectedDate}T${sTime}`
-    const startDateTime = moment(startDateTimeStr).format()
-
-    const endDateTimeStr = `${selectedDate}T${eTime}`
-    const endDateTime = moment(endDateTimeStr).format()
-
-    const currentDateTime = moment()
-
-    function isDateTimeExpired(dateTime) {
+    function isDateTimeExpired(dateTime) {        
         return moment(dateTime).isBefore(currentDateTime);
     }
 
@@ -41,24 +38,25 @@ const checkTimeAvailability = async (req, res, next) => {
         !moment(eTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]')) {
             return res.status(400).json({ message: 'Please choose a time between 8 AM and 5 PM.' });
     }
-
-    const start = new Date(`${selectedDate}T${sTime}`)
-    const end = new Date(`${selectedDate}T${eTime}`)
+    
+    const start = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata');
+    const end = indianTimeZone(`${selectedDate}T${eTime}`).tz('Asia/Kolkata');
 
     const appointments = await Appointment.find({});
 
-    const filteredDoctor =  appointments.filter(appointment => {
+    const filteredAppointment =  appointments.filter(appointment => {
         return appointment.doctor === doctor
     })
 
-    const existingAppointment = filteredDoctor.map(appointment => {
+    const existingAppointment = filteredAppointment.map(appointment => {
         return {startTime: appointment.startTime, endTime: appointment.endTime}
     });
 
         for (const appointment of existingAppointment) {
-            const appointmentStart = new Date(appointment.startTime);
-            const appointmentEnd = new Date(appointment.endTime);
-           
+
+            const appointmentStart = indianTimeZone(appointment.startTime).tz('Asia/Kolkata');
+            const appointmentEnd = indianTimeZone(appointment.endTime).tz('Asia/Kolkata');
+            
             // Check if the appointment overlaps with the given datetime range
             if (
                 (start >= appointmentStart && start < appointmentEnd) ||
