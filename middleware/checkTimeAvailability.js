@@ -1,70 +1,76 @@
 const Appointment = require('../model/Appointment')
-const indianTimeZone = require('moment-timezone')
+const moment = require('moment-timezone')
 
 const checkTimeAvailability = async (req, res, next) => {
     const { patientName, test, doctor, date, sTime, eTime } = req.body;
-        
+
     if (!patientName || !test || !doctor || !date || !sTime || !eTime) {
         return res.status(400).json({ message: 'All Fields Are Required' });
     }
 
-    const selectedDate = indianTimeZone(date).tz('Asia/Kolkata').format('YYYY-MM-DD')
-    const currentDate = indianTimeZone().tz('Asia/Kolkata').format('YYYY-MM-DD')
+    // Parsing and formatting the dates and times
+    const selectedDate = moment.tz(date, 'YYYY-MM-DD', 'Asia/Kolkata').format('YYYY-MM-DD');
+    const currentDate = moment.tz('Asia/Kolkata').format('YYYY-MM-DD');
 
-    const start = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
-    
-    const end = indianTimeZone(`${selectedDate}T${eTime}`).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
+    const start = moment.tz(`${selectedDate}T${sTime}`, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
+    const end = moment.tz(`${selectedDate}T${eTime}`, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
 
-    const currentDateTime = indianTimeZone().tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
-    
-    function isDateTimeExpired(dateTime) {        
-        return indianTimeZone(dateTime).isBefore(currentDateTime);
+    console.log(`start: ${start}`);
+    console.log(`end: ${end}`);
+
+    const currentDateTime = moment.tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
+    console.log(`currentDateTime: ${currentDateTime}`);
+
+    function isDateTimeExpired(dateTime) {
+        return moment.tz(dateTime, 'YYYY-MM-DDTHH:mm', 'Asia/Kolkata').isBefore(currentDateTime);
     }
 
-    if (selectedDate < currentDate) {
+    // Check if the selected date is before the current date
+    if (moment(selectedDate).isBefore(currentDate)) {
         return res.status(400).json({ message: 'Appointment date has already passed' });
     }
 
-    if (!indianTimeZone(sTime, 'HH:mm').isBetween(indianTimeZone('08:00', 'HH:mm'), indianTimeZone('17:00', 'HH:mm'), null, '[]') ||
-    !indianTimeZone(eTime, 'HH:mm').isBetween(indianTimeZone('08:00', 'HH:mm'), indianTimeZone('17:00', 'HH:mm'), null, '[]')) {
+    // Check if the selected times are within the allowed range (08:00 to 17:00)
+    if (
+        !moment(sTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]') ||
+        !moment(eTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]')
+    ) {
         return res.status(400).json({ message: 'Please choose a time between 8 AM and 5 PM.' });
     }
 
-    if(start === end|| start > end){
+    // Check if start and end times are valid
+    if (start === end || start > end) {
         return res.status(400).json({ message: 'Enter Valid Time.' });
     }
 
+    // Check if the given time has already expired
     if (isDateTimeExpired(start) || isDateTimeExpired(end)) {
         return res.status(400).json({ message: 'The given time has already expired.' });
     }
 
-    const appointments = await Appointment.find({});
+    // Retrieve all appointments
+    const appointments = await Appointment.find({ doctor });
 
-    const filteredAppointment =  appointments.filter(appointment => {
-        return appointment.doctor === doctor
-    })
+    // Check for overlapping appointments
+    for (const appointment of appointments) {
+        const appointmentStart = moment.tz(appointment.startTime, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
+        const appointmentEnd = moment.tz(appointment.endTime, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
 
-    const existingAppointment = filteredAppointment.map(appointment => {
-        return {startTime: appointment.startTime, endTime: appointment.endTime}
-    });
+        console.log(`appointmentStart: ${appointmentStart}`);
+        console.log(`appointmentEnd: ${appointmentEnd}`);
 
-        for (const appointment of existingAppointment) {
-            
-            const appointmentStart = appointment.startTime
-            const appointmentEnd = appointment.endTime
-            
-            // Check if the appointment overlaps with the given datetime range
-            if (
-                (start >= appointmentStart && start < appointmentEnd) ||
-                (end > appointmentStart && end <= appointmentEnd) ||
-                (start <= appointmentStart && end >= appointmentEnd)
-            ) {
-                return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
-            }
+        // Check if the appointment overlaps with the given datetime range
+        if (
+            (start >= appointmentStart && start < appointmentEnd) ||
+            (end > appointmentStart && end <= appointmentEnd) ||
+            (start <= appointmentStart && end >= appointmentEnd)
+        ) {
+            return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
         }
-    
-        // If no overlapping appointments found, call next middleware or route handler
-        next();
+    }
+
+    // If no overlapping appointments found, call next middleware or route handler
+    next();
 };
 
-module.exports = checkTimeAvailability
+module.exports = checkTimeAvailability;
