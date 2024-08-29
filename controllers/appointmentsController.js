@@ -1,7 +1,7 @@
 const Appointment = require('../model/Appointment')
 const User = require('../model/User')
 const Notification = require('../model/Notification')
-const indianTimeZone = require('moment-timezone')
+const moment = require('moment-timezone')
 
 const getAllAppointments = async(req, res) => {
 
@@ -36,10 +36,10 @@ const createNewAppointment = async(req, res) =>{
 
     //create new appointment
     try {
-        const selectedDate = indianTimeZone(date).tz('Asia/Kolkata').format('YYYY-MM-DD')
+        const selectedDate = moment.tz(date, 'YYYY-MM-DD', 'Asia/Kolkata').format('YYYY-MM-DD');
         
-        const startTime = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
-        const endTime = indianTimeZone(`${selectedDate}T${eTime}`).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
+        const startTime = moment.tz(`${selectedDate}T${sTime}`, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
+        const endTime = moment.tz(`${selectedDate}T${eTime}`, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
 
         const appointment = await Appointment.create({patientName, test, doctor, date, startTime, endTime})
 
