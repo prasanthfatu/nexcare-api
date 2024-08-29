@@ -39,9 +39,6 @@ const checkTimeAvailability = async (req, res, next) => {
         return res.status(400).json({ message: 'The given time has already expired.' });
     }
     
-    const start = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata');
-    const end = indianTimeZone(`${selectedDate}T${eTime}`).tz('Asia/Kolkata');
-
     const appointments = await Appointment.find({});
 
     const filteredAppointment =  appointments.filter(appointment => {
