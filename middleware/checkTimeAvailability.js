@@ -60,12 +60,14 @@ const checkTimeAvailability = async (req, res, next) => {
         const appointmentStart = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${appointment.startTime}`, 'Asia/Kolkata');
         const appointmentEnd = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${appointment.endTime}`, 'Asia/Kolkata');
 
-        if (
-            (start.isBefore(appointmentEnd) && end.isAfter(appointmentStart)) || // Overlaps with existing appointment
-            (start.isSameOrBefore(appointmentStart) && end.isSameOrAfter(appointmentEnd)) // Completely within existing appointment
-        ) {
-            return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
-        }
+        // Check if the appointment overlaps with the given datetime range
+            if (
+                (start >= appointmentStart && start < appointmentEnd) ||
+                (end > appointmentStart && end <= appointmentEnd) ||
+                (start <= appointmentStart && end >= appointmentEnd)
+            ) {
+                return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
+            }
     }
 
     // If no overlapping appointments found, call next middleware or route handler
