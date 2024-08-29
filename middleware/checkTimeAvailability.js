@@ -15,11 +15,8 @@ const checkTimeAvailability = async (req, res, next) => {
     const start = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
     
     const end = indianTimeZone(`${selectedDate}T${eTime}`).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
-    console.log(`start: ${start}`);
-    console.log(`end: ${end}`);
 
     const currentDateTime = indianTimeZone().tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
-    console.log(`currentDateTime: ${currentDateTime}`)
     
     function isDateTimeExpired(dateTime) {        
         return moment(dateTime).isBefore(currentDateTime);
@@ -47,23 +44,16 @@ const checkTimeAvailability = async (req, res, next) => {
     const filteredAppointment =  appointments.filter(appointment => {
         return appointment.doctor === doctor
     })
-    console.log(`filteredAppointment: ${filteredAppointment}`)
 
     const existingAppointment = filteredAppointment.map(appointment => {
         return {startTime: appointment.startTime, endTime: appointment.endTime}
     });
-    console.log(`existingAppointment: ${existingAppointment}`)
 
         for (const appointment of existingAppointment) {
 
             const appointmentStart = indianTimeZone(appointment.startTime).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
             const appointmentEnd = indianTimeZone(appointment.endTime).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-            console.log(`appointmentStart: ${appointmentStart}`);
-            console.log(`appointmentEnd: ${appointmentEnd}`);
-            
-            console.log(appointment.startTime)
-            console.log(appointment.endTime)
-            
+        
             // Check if the appointment overlaps with the given datetime range
             if (
                 (start >= appointmentStart && start < appointmentEnd) ||
