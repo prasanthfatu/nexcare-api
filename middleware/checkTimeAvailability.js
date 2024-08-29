@@ -1,5 +1,4 @@
 const Appointment = require('../model/Appointment')
-const moment = require('moment')
 const indianTimeZone = require('moment-timezone')
 
 const checkTimeAvailability = async (req, res, next) => {
@@ -19,15 +18,15 @@ const checkTimeAvailability = async (req, res, next) => {
     const currentDateTime = indianTimeZone().tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
     
     function isDateTimeExpired(dateTime) {        
-        return moment(dateTime).isBefore(currentDateTime);
+        return indianTimeZone(dateTime).isBefore(currentDateTime);
     }
 
     if (selectedDate < currentDate) {
         return res.status(400).json({ message: 'Appointment date has already passed' });
     }
 
-    if (!moment(sTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]') ||
-    !moment(eTime, 'HH:mm').isBetween(moment('08:00', 'HH:mm'), moment('17:00', 'HH:mm'), null, '[]')) {
+    if (!indianTimeZone(sTime, 'HH:mm').isBetween(indianTimeZone('08:00', 'HH:mm'), indianTimeZone('17:00', 'HH:mm'), null, '[]') ||
+    !indianTimeZone(eTime, 'HH:mm').isBetween(indianTimeZone('08:00', 'HH:mm'), indianTimeZone('17:00', 'HH:mm'), null, '[]')) {
         return res.status(400).json({ message: 'Please choose a time between 8 AM and 5 PM.' });
     }
 
@@ -50,10 +49,10 @@ const checkTimeAvailability = async (req, res, next) => {
     });
 
         for (const appointment of existingAppointment) {
-
-            const appointmentStart = indianTimeZone(appointment.startTime).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-            const appointmentEnd = indianTimeZone(appointment.endTime).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-        
+            
+            const appointmentStart = appointment.startTime
+            const appointmentEnd = appointment.endTime
+            
             // Check if the appointment overlaps with the given datetime range
             if (
                 (start >= appointmentStart && start < appointmentEnd) ||
