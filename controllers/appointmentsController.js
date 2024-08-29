@@ -36,11 +36,11 @@ const createNewAppointment = async(req, res) =>{
 
     //create new appointment
     try {
-        const selectedDate = moment.tz(date, 'YYYY-MM-DD', 'Asia/Kolkata').format('YYYY-MM-DD');
+        const selectedDate = moment.tz(date, 'YYYY-MM-DD', 'Asia/Kolkata');
         
-        const startTime = moment.tz(`${selectedDate}T${sTime}`, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-        const endTime = moment.tz(`${selectedDate}T${eTime}`, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-
+        const startTime = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${sTime}`, 'Asia/Kolkata');
+        const endTime = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${eTime}`, 'Asia/Kolkata');
+        
         const appointment = await Appointment.create({patientName, test, doctor, date, startTime, endTime})
 
         // Create a notification for the doctor
