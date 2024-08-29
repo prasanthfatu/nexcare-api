@@ -35,7 +35,7 @@ const checkTimeAvailability = async (req, res, next) => {
 
     // Check if start and end times are valid
     if (start.isSameOrAfter(end)) {
-        return res.status(400).json({ message: 'End time must be after start time.' });
+        return res.status(400).json({ message: 'Enter valid time.' });
     }
 
     // Check if the given time has already expired
@@ -44,10 +44,19 @@ const checkTimeAvailability = async (req, res, next) => {
     }
 
     // Retrieve all appointments
-    const appointments = await Appointment.find({ doctor, date: selectedDate.format('YYYY-MM-DD') });
+    const appointments = await Appointment.find({});
+
+    const filteredAppointment =  appointments.filter(appointment => {
+        return appointment.doctor === doctor
+    })
+    
+    const existingAppointment = filteredAppointment.map(appointment => {
+        return {startTime: appointment.startTime, endTime: appointment.endTime}
+    });
+
 
     // Check for overlapping appointments
-    for (const appointment of appointments) {
+    for (const appointment of existingAppointment) {
         const appointmentStart = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${appointment.startTime}`, 'Asia/Kolkata');
         const appointmentEnd = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${appointment.endTime}`, 'Asia/Kolkata');
 
