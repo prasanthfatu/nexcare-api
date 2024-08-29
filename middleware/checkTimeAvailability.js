@@ -12,11 +12,11 @@ const checkTimeAvailability = async (req, res, next) => {
     const selectedDate = indianTimeZone(date).tz('Asia/Kolkata').format('YYYY-MM-DD')
     const currentDate = indianTimeZone().tz('Asia/Kolkata').format('YYYY-MM-DD')
 
-    const startDateTime = `${selectedDate}T${sTime}`
+    const start = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata').format()
     
-    const endDateTime = `${selectedDate}T${eTime}`
+    const end = indianTimeZone(`${selectedDate}T${eTime}`).tz('Asia/Kolkata').format()
 
-    const currentDateTime = indianTimeZone().tz('Asia/Kolkata').format('YYYY-MM-DDTHH:MM')
+    const currentDateTime = indianTimeZone().tz('Asia/Kolkata').format()
     
     function isDateTimeExpired(dateTime) {        
         return moment(dateTime).isBefore(currentDateTime);
@@ -31,11 +31,11 @@ const checkTimeAvailability = async (req, res, next) => {
             return res.status(400).json({ message: 'Please choose a time between 8 AM and 5 PM.' });
     }
     
-    if(startDateTime === endDateTime || startDateTime > endDateTime){
+    if(start === end || start > end){
         return res.status(400).json({ message: 'Enter Valid Time.' });
     }
 
-    if (isDateTimeExpired(startDateTime) || isDateTimeExpired(endDateTime)) {
+    if (isDateTimeExpired(start) || isDateTimeExpired(end)) {
         return res.status(400).json({ message: 'The given time has already expired.' });
     }
     
@@ -54,8 +54,8 @@ const checkTimeAvailability = async (req, res, next) => {
 
         for (const appointment of existingAppointment) {
 
-            const appointmentStart = indianTimeZone(appointment.startTime).tz('Asia/Kolkata');
-            const appointmentEnd = indianTimeZone(appointment.endTime).tz('Asia/Kolkata');
+            const appointmentStart = indianTimeZone(appointment.startTime).tz('Asia/Kolkata').format();
+            const appointmentEnd = indianTimeZone(appointment.endTime).tz('Asia/Kolkata').format();
             
             // Check if the appointment overlaps with the given datetime range
             if (
