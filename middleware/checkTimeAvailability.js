@@ -14,12 +14,8 @@ const checkTimeAvailability = async (req, res, next) => {
 
     const start = moment.tz(`${selectedDate}T${sTime}`, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
     const end = moment.tz(`${selectedDate}T${eTime}`, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-
-    console.log(`start: ${start}`);
-    console.log(`end: ${end}`);
-
+    
     const currentDateTime = moment.tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-    console.log(`currentDateTime: ${currentDateTime}`);
 
     function isDateTimeExpired(dateTime) {
         return moment.tz(dateTime, 'YYYY-MM-DDTHH:mm', 'Asia/Kolkata').isBefore(currentDateTime);
@@ -49,16 +45,21 @@ const checkTimeAvailability = async (req, res, next) => {
     }
 
     // Retrieve all appointments
-    const appointments = await Appointment.find({ doctor });
+     const appointments = await Appointment.find({});
 
+    const filteredAppointment =  appointments.filter(appointment => {
+        return appointment.doctor === doctor
+    })
+    
+    const existingAppointment = filteredAppointment.map(appointment => {
+        return {startTime: appointment.startTime, endTime: appointment.endTime}
+    });
+    
     // Check for overlapping appointments
     for (const appointment of appointments) {
         const appointmentStart = moment.tz(appointment.startTime, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
         const appointmentEnd = moment.tz(appointment.endTime, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-
-        console.log(`appointmentStart: ${appointmentStart}`);
-        console.log(`appointmentEnd: ${appointmentEnd}`);
-
+        
         // Check if the appointment overlaps with the given datetime range
         if (
             (start >= appointmentStart && start < appointmentEnd) ||
