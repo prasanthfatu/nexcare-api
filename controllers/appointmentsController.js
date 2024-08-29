@@ -37,9 +37,9 @@ const createNewAppointment = async(req, res) =>{
     //create new appointment
     try {
         const selectedDate = indianTimeZone(date).tz('Asia/Kolkata').format('YYYY-MM-DD')
-
-        const startTime = `${selectedDate}T${sTime}`
-        const endTime = `${selectedDate}T${eTime}`
+        
+        const startTime = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
+        const endTime = indianTimeZone(`${selectedDate}T${eTime}`).tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm')
 
         const appointment = await Appointment.create({patientName, test, doctor, date, startTime, endTime})
 
