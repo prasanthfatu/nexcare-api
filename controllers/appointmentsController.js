@@ -1,7 +1,7 @@
 const Appointment = require('../model/Appointment')
-const moment = require('moment')
 const User = require('../model/User')
 const Notification = require('../model/Notification')
+const indianTimeZone = require('moment-timezone')
 
 const getAllAppointments = async(req, res) => {
 
@@ -36,24 +36,23 @@ const createNewAppointment = async(req, res) =>{
 
     //create new appointment
     try {
-        const dateObj = moment(date)
-        const dateStr = dateObj.format('YYYY-MM-DD');
+        const selectedDate = indianTimeZone(date).tz('Asia/Kolkata').format('YYYY-MM-DD')
 
-        const startTime = `${dateStr}T${sTime}`
-        const endTime = `${dateStr}T${eTime}`
-
+        const startTime = indianTimeZone(`${selectedDate}T${sTime}`).tz('Asia/Kolkata').format()
+        const endTime = indianTimeZone(`${selectedDate}T${eTime}`).tz('Asia/Kolkata').format()
+        
         const appointment = await Appointment.create({patientName, test, doctor, date, startTime, endTime})
 
-            // Create a notification for the doctor
-            const notification = new Notification({
-                recipient: doctor,
-                content: 'New appointment request',
-                type: 'request',
-                appointmentId: appointment._id
-            });
+        // Create a notification for the doctor
+        const notification = new Notification({
+            recipient: doctor,
+            content: 'New appointment request',
+            type: 'request',
+            appointmentId: appointment._id
+        });
 
-            // Save the notification to the database
-            await notification.save();
+        // Save the notification to the database
+        await notification.save();
     
         //add notification Id to appointment
         appointment.notificationId = notification._id 
