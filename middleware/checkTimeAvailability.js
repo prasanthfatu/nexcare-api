@@ -18,7 +18,7 @@ const checkTimeAvailability = async (req, res, next) => {
     const currentDateTime = moment.tz('Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
 
     function isDateTimeExpired(dateTime) {
-        return moment.tz(dateTime, 'YYYY-MM-DDTHH:mm', 'Asia/Kolkata').isBefore(currentDateTime);
+        return moment.tz(dateTime, 'Asia/Kolkata').isBefore(currentDateTime);
     }
 
     // Check if the selected date is before the current date
@@ -57,8 +57,9 @@ const checkTimeAvailability = async (req, res, next) => {
     
     // Check for overlapping appointments
     for (const appointment of appointments) {
-        const appointmentStart = moment.tz(appointment.startTime, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
-        const appointmentEnd = moment.tz(appointment.endTime, 'Asia/Kolkata').format('YYYY-MM-DDTHH:mm');
+        
+        const appointmentStart = appointment.startTime
+         const appointmentEnd = appointment.endTime
         
         // Check if the appointment overlaps with the given datetime range
         if (
