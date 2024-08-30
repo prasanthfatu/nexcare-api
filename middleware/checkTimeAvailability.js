@@ -60,9 +60,17 @@ const checkTimeAvailability = async (req, res, next) => {
         const appointmentStart = appointment.startTime;
         const appointmentEnd = appointment.endTime;
 
-        if (
-            (start.isBefore(appointmentEnd) && end.isAfter(appointmentStart)) || // Overlaps with existing appointment
-            (start.isSameOrBefore(appointmentStart) && end.isSameOrAfter(appointmentEnd)) // Completely within existing appointment
+        // if (
+        //     (start.isBefore(appointmentEnd) && end.isAfter(appointmentStart)) || // Overlaps with existing appointment
+        //     (start.isSameOrBefore(appointmentStart) && end.isSameOrAfter(appointmentEnd)) // Completely within existing appointment
+        // ) {
+        //     return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
+        // }
+         // Check if the appointment overlaps with the given datetime range
+         if (
+            (start >= appointmentStart && start < appointmentEnd) ||
+            (end > appointmentStart && end <= appointmentEnd) ||
+            (start <= appointmentStart && end >= appointmentEnd)
         ) {
             return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
         }
