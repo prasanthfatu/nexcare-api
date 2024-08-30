@@ -9,7 +9,7 @@ const checkTimeAvailability = async (req, res, next) => {
     }
 
     // Parse and format the dates and times
-    const selectedDate = moment.tz(date, 'YYYY-MM-DD', 'Asia/Kolkata');
+    const selectedDate = moment.tz(date, 'Asia/Kolkata');
     const currentDate = moment.tz('Asia/Kolkata');
 
     const start = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${sTime}`, 'Asia/Kolkata');
