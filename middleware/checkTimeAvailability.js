@@ -46,7 +46,10 @@ const checkTimeAvailability = async (req, res, next) => {
     let appointments
     try {
         appointments = await Appointment.find({});
-        if(appointments.length > 0) {
+
+        if (appointments.length === 0) {
+            return next();
+        }
             
             const filteredAppointment =  appointments.filter(appointment => {
                 return appointment.doctor === doctor
@@ -61,20 +64,19 @@ const checkTimeAvailability = async (req, res, next) => {
                 
                 const appointmentStart = appointment.startTime;
                 const appointmentEnd = appointment.endTime;
-                
+
                 if (
                     (start.isBefore(appointmentEnd) && end.isAfter(appointmentStart)) || // Overlaps with existing appointment
                     (start.isSameOrBefore(appointmentStart) && end.isSameOrAfter(appointmentEnd)) // Completely within existing appointment
                 ) {
                     return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
                 }
-        
+    
             }
+
+            // If no overlapping appointments found, proceed to the next middleware
             next();
-        }
-        if (appointments.length === 0) {
-            next()
-        }
+    
     } catch (error) {
         return res.status(500).json({message: "Internal Server Error"})
     }
