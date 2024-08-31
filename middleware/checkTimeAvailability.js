@@ -42,46 +42,42 @@ const checkTimeAvailability = async (req, res, next) => {
     if (isDateTimeExpired(start) || isDateTimeExpired(end)) {
         return res.status(400).json({ message: 'The given time has already expired.' });
     }
-
     // Retrieve all appointments
-    const appointments = await Appointment.find({});
-    
-    if(!appointments){
-        return res.status(400).json({message: 'No Server Response.'})
-    }
-    
-    const filteredAppointment =  appointments.filter(appointment => {
-        return appointment.doctor === doctor
-    })
-    
-    const existingAppointment = filteredAppointment.map(appointment => {
-        return {startTime: appointment.startTime, endTime: appointment.endTime}
-    });
-
-
-    // Check for overlapping appointments
-    for (const appointment of existingAppointment) {
-        const appointmentStart = appointment.startTime;
-        const appointmentEnd = appointment.endTime;
-
-        // if (
-        //     (start.isBefore(appointmentEnd) && end.isAfter(appointmentStart)) || // Overlaps with existing appointment
-        //     (start.isSameOrBefore(appointmentStart) && end.isSameOrAfter(appointmentEnd)) // Completely within existing appointment
-        // ) {
-        //     return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
-        // }
-         // Check if the appointment overlaps with the given datetime range
-         if (
-            (start >= appointmentStart && start < appointmentEnd) ||
-            (end > appointmentStart && end <= appointmentEnd) ||
-            (start <= appointmentStart && end >= appointmentEnd)
-        ) {
-            return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
+    let appointments
+    try {
+        appointments = await Appointment.find({});
+        if(appointments.length > 0) {
+            
+            const filteredAppointment =  appointments.filter(appointment => {
+                return appointment.doctor === doctor
+            })
+                    
+            const existingAppointment = filteredAppointment.map(appointment => (
+                 {startTime: appointment.startTime, endTime: appointment.endTime}
+            ));
+                
+            // Check for overlapping appointments
+            for (const appointment of existingAppointment) {
+                
+                const appointmentStart = appointment.startTime;
+                const appointmentEnd = appointment.endTime;
+                
+                if (
+                    (start.isBefore(appointmentEnd) && end.isAfter(appointmentStart)) || // Overlaps with existing appointment
+                    (start.isSameOrBefore(appointmentStart) && end.isSameOrAfter(appointmentEnd)) // Completely within existing appointment
+                ) {
+                    return res.status(409).json({ message: `Requested Time ${sTime} - ${eTime} is not available. Please choose a different time.` });
+                }
+        
+            }
+            next();
         }
+        if (appointments.length === 0) {
+            next()
+        }
+    } catch (error) {
+        return res.status(500).json({message: "Internal Server Error"})
     }
-
-    // If no overlapping appointments found, call next middleware or route handler
-    next();
 };
 
 module.exports = checkTimeAvailability;
