@@ -46,7 +46,7 @@ const checkTimeAvailability = async (req, res, next) => {
     // Retrieve all appointments
     const appointments = await Appointment.find({});
     
-    if(!appointments || appointments.length === 0){
+    if(!appointments){
         return res.status(400).json({message: 'No Server Response.'})
     }
     
