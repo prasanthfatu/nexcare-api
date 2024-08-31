@@ -36,7 +36,7 @@ const createNewAppointment = async(req, res) =>{
 
     //create new appointment
     try {
-        const selectedDate = moment.tz(date, 'YYYY-MM-DD', 'Asia/Kolkata');
+        const selectedDate = moment.tz(date, 'Asia/Kolkata');
         
         const startTime = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${sTime}`, 'Asia/Kolkata');
         const endTime = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${eTime}`, 'Asia/Kolkata');
