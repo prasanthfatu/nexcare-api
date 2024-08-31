@@ -45,7 +45,11 @@ const checkTimeAvailability = async (req, res, next) => {
 
     // Retrieve all appointments
     const appointments = await Appointment.find({});
-
+    
+    if(!appointments){
+        return res.status(400).json({message: 'No Server Response.'})
+    }
+    
     const filteredAppointment =  appointments.filter(appointment => {
         return appointment.doctor === doctor
     })
