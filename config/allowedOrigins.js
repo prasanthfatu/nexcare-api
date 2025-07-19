@@ -1,6 +1,5 @@
 const allowedOrigins = [
-    'https://nexcare.onrender.com',
-    'http://localhost:3000'
+    'https://nexcare.onrender.com'
 ];
 
 module.exports = allowedOrigins;
