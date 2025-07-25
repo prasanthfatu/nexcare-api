@@ -1,7 +1,5 @@
 const Appointment = require('../model/Appointment')
-const User = require('../model/User')
 const Notification = require('../model/Notification')
-const moment = require('moment-timezone')
 
 const getAllAppointments = async(req, res) => {
 
@@ -16,32 +14,15 @@ const getAllAppointments = async(req, res) => {
 
 const createNewAppointment = async(req, res) =>{
 
-    const {patientName, test, doctor, date, sTime, eTime} = req.body
+    const {patientName, test, doctor, date, time} = req.body
 
-    if(!patientName || !test || !doctor || !date || !sTime || !eTime){
+    if(!patientName || !test || !doctor || !date || !time){
         return res.status(400).json({message: 'All Fields Are Required'})
     }
 
-     // Check if doctor is provided and exists
-     let doc;
-     try {
-        doc = await User.findOne({username: doctor}).exec()
-        if (!doctor) {
-            return res.status(404).json({ message: 'Doctor not found' });
-        }
-     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Error finding doctor' });        
-     }
-
     //create new appointment
-    try {
-        const selectedDate = moment.tz(date, 'Asia/Kolkata');
-        
-        const startTime = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${sTime}`, 'Asia/Kolkata');
-        const endTime = moment.tz(`${selectedDate.format('YYYY-MM-DD')}T${eTime}`, 'Asia/Kolkata');
-        
-        const appointment = await Appointment.create({patientName, test, doctor, date, startTime, endTime})
+    try {        
+        const appointment = await Appointment.create({patientName, test, doctor, date, time})
 
         // Create a notification for the doctor
         const notification = new Notification({
@@ -61,8 +42,10 @@ const createNewAppointment = async(req, res) =>{
         res.status(201).json(appointment)
 
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: 'Internal Server Error' })
+        if (err.code === 11000) {
+        return res.status(409).json({ message: 'Time slot already booked' });
+        }
+        res.status(500).json({ message: 'Error booking appointment', error: err.message });
     }
 }
 

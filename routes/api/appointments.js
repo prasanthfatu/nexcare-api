@@ -1,11 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const appointmentsController = require('../../controllers/appointmentsController')
-const checkTimeAvailability = require('../../middleware/checkTimeAvailability')
 
 router.route('/')
             .get(appointmentsController.getAllAppointments)
-            .post(checkTimeAvailability, appointmentsController.createNewAppointment)
+            .post(appointmentsController.createNewAppointment)
             .put(appointmentsController.updateAppointment)
 
 router.route('/:appId')

@@ -62,6 +62,8 @@ app.use('/profile', require('./routes/api/profiles'))
 app.use('/coverphotos', require('./routes/api/coverphotos'))
 app.use('/healthcareprovider', require('./routes/api/healthcareprovider'))
 
+app.use('/available', require('./routes/api/available'))
+
 app.all('*', (req, res) => {
     res.status(404);
     if (req.accepts('html')) {

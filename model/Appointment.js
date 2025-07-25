@@ -5,30 +5,35 @@ const appointmentSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    test: {
-        type: String,
-        required: true
-    },
     doctor: {
         type: String,
         required: true
     },
-    startTime: {
+    date: {
         type: String,
-        requied: true
-    }, 
-    endTime: {
-        type:String,
-        require: true
+        required: true
     },
-    status: {
+    time: {
         type: String,
-        enum: ['pending', 'accept', 'deny'],
-        default: 'pending',
-      },
+        required: true
+    },
     notificationId: {
         type: String
-    } 
+    },
+    test: {
+        type: String,
+        required: true
+    },
+    status:{
+        type: String,
+        enum: ['pending', 'accept', 'deny'],
+        default: 'pending'
+    }
+}, {
+    timestamps: true
 })
+
+//prevent double booking
+appointmentSchema.index({doctor: 1, date: 1, time: 1}, {unique: true})
 
 module.exports = mongoose.model('Appointment', appointmentSchema)
