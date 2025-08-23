@@ -18,6 +18,14 @@ const userSchema = new Schema({
         required: true
     },
 
+    department: {
+        type: String
+    },
+
+    tests: {
+        type: [String]
+    },
+
     refreshToken: String,
 
     profileImage: String,

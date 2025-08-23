@@ -39,7 +39,7 @@ const getAllUsers = async (req, res) => {
 
 const updateUser = async(req, res) => {
 
-    const {userId, username, roles} = req.body
+    const {userId, username, roles, department} = req.body
 
     if(!userId || !username || !roles){
         return res.status(400).json({message: `All fields are required`})
@@ -60,6 +60,7 @@ const updateUser = async(req, res) => {
     }
     user.username = username
     user.roles = roles
+    if(department) user.department = department
     const updatedUser = await user.save()
     res.json(`${updatedUser.username} is updated.`)
 
