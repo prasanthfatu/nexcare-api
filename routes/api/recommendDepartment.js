@@ -4,5 +4,6 @@ const recommendDepartmentController = require("../../controllers/recommendDepart
 
 router.route('/')
             .post(recommendDepartmentController.testDepartment)
+            
 
 module.exports = router            

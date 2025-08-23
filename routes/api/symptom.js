@@ -4,5 +4,6 @@ const symptomsController = require("../../controllers/symptomsController")
 
 router.route('/')
             .post(symptomsController.checkSymptom)
+            
 
 module.exports = router            

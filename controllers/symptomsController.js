@@ -5,6 +5,7 @@ const NodeCache = require("node-cache");  // simple in-memory cache
 const cache = new NodeCache({ stdTTL: 86400 }); // cache for 1 day (86400s)
 
 const checkSymptom = async (req, res) => {
+
   const { symptoms } = req.body;
 
   if (!symptoms || symptoms.trim().length < 3) {
@@ -12,8 +13,10 @@ const checkSymptom = async (req, res) => {
   }
 
   try {
+
     // ✅ Check Cache First
     const cached = cache.get(symptoms.toLowerCase());
+
     if (cached) {
       return res.json({
         step: 1,
@@ -41,9 +44,12 @@ const checkSymptom = async (req, res) => {
     let output;
 
     try {
+
       const result = await model.generateContent(prompt);
       output = result.response.text();
+
     } catch (err) {
+
       // ✅ If quota exceeded, fallback to pro
       if (err.status === 429) {
         console.warn("Flash quota exceeded, falling back to pro...");
@@ -53,6 +59,7 @@ const checkSymptom = async (req, res) => {
       } else {
         throw err;
       }
+      
     }
 
     // ✅ Save to Cache

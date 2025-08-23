@@ -65,6 +65,7 @@ app.use('/profile', require('./routes/api/profiles'))
 app.use('/coverphotos', require('./routes/api/coverphotos'))
 app.use('/healthcareprovider', require('./routes/api/healthcareprovider'))
 
+//Check time availability
 app.use('/available', require('./routes/api/available'))
 
 app.all('*', (req, res) => {

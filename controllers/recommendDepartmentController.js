@@ -5,15 +5,16 @@ const User = require("../model/User");
 //Department Suggestion (only if user says "yes")
 
 const testDepartment = async (req, res) => {
-
   const { symptoms, confirm } = req.body; // confirm = "yes" or "no"
 
   try {
     if (confirm.toLowerCase() !== "yes") {
+
       return res.json({
         step: 2,
         message: "Okay, no department suggestion provided. Take care!"
       });
+      
     }
 
     // ✅ Fetch healthcare providers

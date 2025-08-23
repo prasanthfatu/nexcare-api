@@ -62,6 +62,7 @@ const updateUser = async(req, res) => {
     user.roles = roles
     if(department) user.department = department
     const updatedUser = await user.save()
+    
     res.json(`${updatedUser.username} is updated.`)
 
 }
